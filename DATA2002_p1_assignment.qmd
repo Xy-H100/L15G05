@@ -94,6 +94,40 @@ write_csv(df_clean, "survey_cleaned.csv")
 ## RQ2
 
 <See Assignment Briefing page>
+## RQ2 — Step 1: Data import & cleaning (multitasking vs cramming)
+
+```{r}
+#| label: rq2-setup
+#| message: false
+library(tidyverse)
+```
+
+```{r}
+#| label: rq2-clean
+survey <- read_csv("survey_cleaned.csv")
+
+# Keep only the variables needed for RQ2, and derive a binary
+# "Cram vs Not Cram" version of `assess` so the test lines up with the RQ
+# statement ("multitasking and cramming"), rather than the original 3-level
+# assessment-style variable (Gradually / Immediately / Cram).
+rq2_data <- survey %>%
+  select(assess, multitask) %>%
+  drop_na(assess, multitask) %>%
+  mutate(
+    assess    = factor(assess, levels = c("Gradually", "Immediately", "Cram")),
+    is_cram   = if_else(assess == "Cram", "Cram", "Not Cram"),
+    is_cram   = factor(is_cram, levels = c("Not Cram", "Cram")),
+    multitask = factor(multitask, levels = c("no", "yes"))
+  )
+
+glimpse(rq2_data)
+```
+
+We only select `assess` and `multitask` (not the whole cleaned dataset), and
+only drop rows missing on these two columns — so this subsetting is specific
+to RQ2 and doesn't discard rows that are unusable for other RQs. `assess` is
+collapsed from 3 levels into a binary `is_cram` variable to match the RQ2
+question directly (cram vs not cram).
 
 ## RQ3
 
