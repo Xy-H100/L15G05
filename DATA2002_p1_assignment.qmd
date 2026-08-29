@@ -129,6 +129,51 @@ to RQ2 and doesn't discard rows that are unusable for other RQs. `assess` is
 collapsed from 3 levels into a binary `is_cram` variable to match the RQ2
 question directly (cram vs not cram).
 
+## RQ2 — Step 2: Exploratory visualisation (multitasking vs cramming)
+
+```{r}
+#| label: rq2-eda
+#| fig-cap: "Proportion of students who multitask, by cramming behaviour"
+rq2_data %>%
+  count(is_cram, multitask) %>%
+  group_by(is_cram) %>%
+  mutate(prop = n / sum(n)) %>%
+  ggplot(aes(x = is_cram, y = prop, fill = multitask)) +
+  geom_col(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    x = "Assessment preparation style",
+    y = "Proportion of students",
+    fill = "Multitasks?",
+    title = "Multitasking is more common among students who cram"
+  ) +
+  theme_minimal(base_size = 13)
+```
+
+Supplementary (optional) — the same relationship broken down by the original
+3-level `assess` variable, useful as a descriptive figure even though the
+formal test uses the collapsed 2x2 version:
+
+```{r}
+#| label: rq2-eda-3level
+survey %>%
+  drop_na(assess, multitask) %>%
+  count(assess, multitask) %>%
+  group_by(assess) %>%
+  mutate(prop = n / sum(n)) %>%
+  ggplot(aes(x = assess, y = prop, fill = multitask)) +
+  geom_col(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = "Assessment preparation style (3 levels)",
+       y = "Proportion of students", fill = "Multitasks?") +
+  theme_minimal(base_size = 13)
+```
+
+Both plots show the same pattern: the multitasking rate is visibly higher
+among students who cram (~75%) than among those who don't (~52% "Gradually",
+~46% "Immediately"). This motivates formally testing the association in the
+next step.
+
 ## RQ3
 
 <See Assignment Briefing page>
