@@ -13,23 +13,30 @@ table-of-contents: true # (Optional) Creates a table of contents
 number-sections: true # (Optional) Puts numbers next to heading/subheadings
 ---
 
-## Introduction
+# Introduction
 
-<See Assignment Briefing Page>
+[Motivation + client]
 
-## Problem & Client
+[Dataset description]
 
-<See Assignment Briefing Page>
+[Survey questions used]
 
-## Dataset
+[Potential biases and limitations of the survey]
 
-<See Assignment Briefing Page>
 
-## Biases
+## Data Wrangling
 
-<See Assignment Briefing Page>
+[Import data]
 
-## Data cleaning
+[Variable selection]
+
+[Missing-value handling]
+
+[Recode cram variable]
+
+[Clean paid employment hours]
+
+[Prepare multitask variable]
 
 **Load, rename, and clean**
 
@@ -87,9 +94,28 @@ ggplot(bind_rows(
 write_csv(df_clean, "survey_cleaned.csv")
 ```
 
+# Results
+
 ## RQ1
 
-<See Assignment Briefing page>
+[Motivation]
+
+[EDA figure + summary statistics]
+
+[Hypotheses]
+
+[Assumptions]
+
+[Test statistic]
+
+[Observed test statistic]
+
+[p-value]
+
+[Decision + contextual conclusion]
+
+[Limitations]
+
 
 ## RQ2
 
@@ -235,10 +261,45 @@ independence: students who cram are considerably more likely to multitask
    information about the distinction between "Gradually" and
    "Immediately" preparers.
 
-## RQ3
 
-<See Assignment Briefing page>
+## RQ3: Do students who multitask during lectures spend a different average number of hours per week in paid employment compared with students who do not multitask?
 
-## Final Conclusion
+[Motivation]
 
-<See Assignment Briefing page>
+[EDA figure + summary statistics]
+
+[Observed statistic]
+
+[Hypotheses]
+
+[Permutation procedure]
+
+[Permutation null distribution figure]
+
+[Permutation p-value]
+
+[Decision + contextual conclusion]
+
+[Limitations]
+
+
+# Conclusion
+
+[Integrate the three findings into one story]
+
+[Implications for client]
+
+[Overall limitations / no causal inference]
+
+
+# AI Usage Statement
+
+[...]
+
+
+# ISI Professional Ethics Statement
+
+[...]
+
+
+# References
