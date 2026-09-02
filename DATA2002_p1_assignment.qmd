@@ -72,7 +72,8 @@ df <- raw %>%
     multitask    = `Do you multi-task in lectures? (ie do other tasks concurrently)`
   ) %>%
   filter(assess != "Other") %>%
-  mutate(assess = factor(assess, levels = c("Immediately", "Gradually", "Cram")))
+  mutate(assess = factor(assess, levels = c("Immediately", "Gradually", "Cram")),
+         multitask = factor(multitask, levels = c("no", "yes"), labels = c("No", "Yes")))
 
 threshold <- 70
 
@@ -118,9 +119,7 @@ write_csv(df_clean, "survey_cleaned.csv")
 
 
 ## RQ2
-
-<See Assignment Briefing page>
-## RQ2 — Step 1: Data import & cleaning (multitasking vs cramming)
+### Step 1: Data import & cleaning (multitasking vs cramming)
 
 ```{r}
 #| label: rq2-setup
@@ -143,7 +142,7 @@ rq2_data <- survey %>%
     assess    = factor(assess, levels = c("Gradually", "Immediately", "Cram")),
     is_cram   = if_else(assess == "Cram", "Cram", "Not Cram"),
     is_cram   = factor(is_cram, levels = c("Not Cram", "Cram")),
-    multitask = factor(multitask, levels = c("no", "yes"))
+    multitask = factor(multitask, levels = c("No", "Yes"))
   )
 
 glimpse(rq2_data)
@@ -155,7 +154,7 @@ to RQ2 and doesn't discard rows that are unusable for other RQs. `assess` is
 collapsed from 3 levels into a binary `is_cram` variable to match the RQ2
 question directly (cram vs not cram).
 
-## RQ2 — Step 2: Exploratory visualisation (multitasking vs cramming)
+### Step 2: Exploratory visualisation (multitasking vs cramming)
 
 ```{r}
 #| label: rq2-eda
@@ -200,7 +199,7 @@ among students who cram (~75%) than among those who don't (~52% "Gradually",
 ~46% "Immediately"). This motivates formally testing the association in the
 next step.
 
-## RQ2 — Step 3: Hypothesis test — Chi-squared test of independence
+### Step 3: Hypothesis test — Chi-squared test of independence
 
 **H:**
 $H_0$: multitasking behaviour is independent of cramming behaviour.
@@ -264,11 +263,99 @@ independence: students who cram are considerably more likely to multitask
 
 ## RQ3: Do students who multitask during lectures spend a different average number of hours per week in paid employment compared with students who do not multitask?
 
-[Motivation]
+Paid employment represents an external time commitment for students. Students balancing more paid work with university study may exhibit different lecture behaviours. Having examined paid employment in relation to cramming and multitasking in relation to cramming, we investigate whether paid-employment hours also differ between students who do and do not multitask during lectures.
 
-[EDA figure + summary statistics]
+```{r}
+#| label: tbl-flipper
+#| tbl-cap: "Summary statistics of weekly paid employment hours by multitasking status."
 
-[Observed statistic]
+rq3_summary <- df_clean %>%
+  filter(!is.na(work_hrs), !is.na(multitask)) %>%
+  group_by(multitask) %>%
+  summarise(
+    n = n(),
+    mean = mean(work_hrs),
+    median = median(work_hrs),
+    sd = sd(work_hrs),
+    Q1 = quantile(work_hrs, 0.25),
+    Q3 = quantile(work_hrs, 0.75),
+    min = min(work_hrs),
+    max = max(work_hrs)
+  )
+
+knitr::kable(rq3_summary)
+```
+The boxplot in @fig-work-multitask compares weekly paid-employment hours between students who reported multitasking during lectures and those who did not. Students who reported multitasking had a higher mean weekly paid-employment time (8.02 hours) than those who did not multitask (6.23 hours), giving an observed mean difference of 1.79 hours per week. Both groups show visually right-skewed distributions, with many students reporting few or no hours of paid employment and a smaller number reporting substantially higher working hours. This observed difference in group means is examined formally using a permutation test.
+```{r}
+#| label: fig-work-multitask
+#| fig-cap: "Distribution of weekly paid employment hours by multitasking status."
+
+df_clean %>%
+  filter(!is.na(work_hrs), !is.na(multitask)) %>%
+  ggplot(aes(x = multitask, y = work_hrs)) +
+  
+  geom_boxplot(
+    aes(fill = multitask),
+    width = 0.5,
+    outlier.shape = NA,
+    alpha = 0.4
+  ) +
+  
+  geom_jitter(
+    aes(colour = "Individual observations"),
+    position = position_jitter(
+      width = 0.15,
+      seed = 123
+    ),
+    alpha = 0.35,
+    size = 1.5
+  ) +
+  
+  stat_summary(
+    aes(colour = "Group mean"),
+    fun = mean,
+    geom = "point",
+    shape = 18,
+    size = 4
+  ) +
+  
+  stat_summary(
+    fun = mean,
+    geom = "text",
+    aes(label = after_stat(round(y, 2))),
+    vjust = -0.75,
+    size = 3.5
+  ) +
+  
+  scale_fill_manual(
+    name = "Multitasking",
+    values = c(
+      "No" = "#A8DADC",
+      "Yes" = "#F4A261"
+    )
+  ) +
+  
+  scale_colour_manual(
+    name = NULL,
+    values = c(
+      "Individual observations" = "#457B9D",
+      "Group mean" = "red"
+    )
+  ) +
+  
+  labs(
+    x = "Multitasking during lectures",
+    y = "Weekly paid employment (hours)",
+    title = "Weekly paid employment hours by multitasking status",
+    caption = "Diamonds and labels indicate group means."
+  ) +
+  
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    legend.position = "top"
+  )
+```
 
 [Hypotheses]
 
